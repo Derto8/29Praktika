@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         locationManager = MapKitFactory.getInstance().createLocationManager();
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
+            setDataLocation();
         } else {
             ActivityCompat.requestPermissions(
                     this,
@@ -58,7 +59,40 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    void setDataLocation() {
 
+        map.move(
+                new CameraPosition(
+                        new Point(58.01123789949114,56.25446366030623), 15f, 0.0f, 0.0f),
+                new Animation(Animation.Type.SMOOTH, 0),
+                null
+        );
+        map.getMapObjects().addPlacemark(
+                new Point(55.751574, 38.573856),
+                ImageProvider.fromResource(MainActivity.this, R.mipmap.ic_launcher));
+
+
+        locationManager.requestSingleUpdate(new LocationListener() {
+
+            @Override
+            public void onLocationUpdated(@NonNull com.yandex.mapkit.location.Location location) {
+                double latitude = location.getPosition().getLatitude();
+                double longitude = location.getPosition().getLongitude();
+
+                CameraPosition cameraPosition = new CameraPosition(
+                        new Point(latitude, longitude),
+                        20.0f, 0.0f, 0.0f
+                );
+                map.move(cameraPosition, new Animation(Animation.Type.SMOOTH, 5), null);
+            }
+
+            @Override
+            public void onLocationStatusUpdated(@NonNull LocationStatus locationStatus) {
+
+            }
+        });
+
+    }
     @Override
     protected void onStop() {
         super.onStop();
